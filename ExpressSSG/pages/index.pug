@@ -1,0 +1,22 @@
+extends layout
+
+
+block metas
+    title Inicio de mi sitio web
+    meta(name="description", content="Esta es la descripción de mi sitio web")
+
+block content
+    main.container
+        h1 Home
+        nav
+            ul
+                li
+                 a(href="/contacto") Contacto (.html)
+                li
+                 a(href="/git") Git (.md)
+                li
+                 a(href="/nodejs") Node.js (.md)
+                li
+                 a(href="/hola") Hola (.pug)
+                li
+                 a(href="/nada") Error 404 (.pug)

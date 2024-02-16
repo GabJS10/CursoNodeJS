@@ -1,0 +1,19 @@
+extends layout
+
+block content
+    main.container
+        h1.text-center= title
+        a.add-button(href="/add") Add new task
+        ul.task-list
+            if tasks.length === 0
+                li
+                    b.text-center No tasks found
+            else
+                each task in tasks
+                    li(class=task.completed ? 'completed' : '')
+                        a(href=`/edit/${task.id}`) #{task.title} 
+                        if task.completed
+                            a.uncomplete-button(href=`/uncomplete/${task.id}`) desmarcar
+                        else
+                            a.complete-button(href=`/complete/${task.id}`) completar
+                        a.delete-button(href=`/delete/${task.id}`) 🗑    

@@ -1,0 +1,92 @@
+import { createServer } from "http";
+import { get } from "https";
+import { createInterface } from "readline";
+import fs from "fs";
+
+/*
+
+const hostname = "localhost",
+  port = 3000,
+  options = {
+    host: "jonmircha.com",
+    port: 443,
+    path: "/cursos",
+  };
+*/
+
+let htmlCode = "";
+
+const rl = createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+function presentation(callback) {
+  rl.question("Dame el nombre de tu host: ", (hostname) => {
+    rl.question("Dame el puerto para el host: ", (port) => {
+      rl.question("Dame el host que quieres snifferear: ", (host) => {
+        rl.question("Dame el path: ", (path) => {
+          rl.question("Dame el puerto: ", (portNumber) => {
+            callback({
+              hostname,
+              port,
+              host,
+              path,
+              portNumber,
+            });
+            rl.close();
+          });
+        });
+      });
+    });
+  });
+}
+
+presentation((options) => {
+  const httpClient = (res) => {
+    console.log(
+      `El sitio ${options.host} ha respondido. Código: ${res.statusCode}. Mensaje: ${res.statusMessage}.`
+    );
+
+    res.on("data", (data) => {
+      htmlCode += data;
+      console.log(data, data.toString());
+      fs.writeFile("sniffer.html", htmlCode, (err) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+      });
+    });
+  };
+
+  const httpError = (err) => {
+    console.error(
+      `El sitio ${options.host} no ha respondido. Código: ${err.code}. Mensaje: ${err.message}.`
+    );
+  };
+
+  const webServer = (req, res) => {
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.end(htmlCode);
+  };
+
+  try {
+    //instancia cliente HTTP o HTTPs
+    get(
+      { host: options.host, port: options.portNumber, path: options.path },
+      httpClient
+    ).on("error", httpError);
+
+    //instancia servidor local HTTP
+    createServer(webServer).listen(options.port, options.hostname, () => {
+      console.log(
+        `Servidor corriendo en http://${options.hostname}:${options.port}/`
+      );
+    });
+  } catch (error) {
+    console.log("Probablemente no rellenaste todos los datos.");
+    console.log(error);
+  }
+});
